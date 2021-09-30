@@ -1,0 +1,9 @@
+{
+  "name": "@bonfire-xmpp/core",
+  "version": "0.1.0",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@bonfire-xmpp/apibridge": "^1.0.2",
+    "@bonfire-xmpp/verse": "^1.0.0"
+  }
+}
