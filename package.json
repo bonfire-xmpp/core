@@ -4,6 +4,13 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@bonfire-xmpp/apibridge": "^1.0.2",
-    "@bonfire-xmpp/verse": "^1.0.0"
+    "@bonfire-xmpp/verse": "^1.0.0",
+    "@types/sha.js": "^2.4.0",
+    "@types/webpack-env": "^1.16.2",
+    "idb-keyval": "^6.0.2",
+    "sha.js": "^2.4.11"
+  },
+  "peerDependencies": {
+    "typescript": "^4.4.3"
   }
 }
