@@ -22,7 +22,7 @@ export type Require = <F extends keyof Features>(
   feature: F
 ) => Promise<Features[F]>;
 
-import { Bridge } from "@bonfire-xmpp/apibridge";
+import type { ModelBridge } from "./index";
 import { Agent } from "@bonfire-xmpp/verse";
 export type Client = Agent;
 
@@ -47,13 +47,13 @@ export interface Context {
   require: Require;
   client: Client;
   bind: Bind;
-  bridge: Bridge;
+  bridge: ModelBridge;
 }
 
 export * from "./feature-modules";
 import * as Modules from "./feature-modules";
 
-export function setupFeatures(client: Client, bridge: Bridge): void {
+export function setupFeatures(client: Client, bridge: ModelBridge): Features {
   const modules = Modules as Record<
     string,
     { default: (ctx: Context) => void | Promise<void> }
@@ -142,5 +142,6 @@ export function setupFeatures(client: Client, bridge: Bridge): void {
     });
   });
 
-  console.log(providedFeatures);
+  console.debug(providedFeatures);
+  return providedFeatures;
 }

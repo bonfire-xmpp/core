@@ -5,6 +5,7 @@
   "dependencies": {
     "@bonfire-xmpp/apibridge": "^1.0.2",
     "@bonfire-xmpp/verse": "^1.0.0",
+    "@reduxjs/toolkit": "^1.6.2",
     "@types/sha.js": "^2.4.0",
     "@types/webpack-env": "^1.16.2",
     "idb-keyval": "^6.0.2",

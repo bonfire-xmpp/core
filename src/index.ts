@@ -1,7 +1,9 @@
 import * as XMPP from "@bonfire-xmpp/verse";
-import type { Bridge } from "@bonfire-xmpp/apibridge";
+import { Bridge } from "@bonfire-xmpp/apibridge";
 
-import { setupFeatures } from "./features";
+import { setupFeatures, Features } from "./features";
+
+import type { ViewAPI } from "./view";
 
 const api = ({ bridge }: { bridge: Bridge }) => ({
   $state: {
@@ -19,12 +21,18 @@ const api = ({ bridge }: { bridge: Bridge }) => ({
       });
     }
 
-    // We've been called before, just connect with the new options
     return this.$state.client.connect(opts);
   },
 });
 
-export default api;
-
 export type API = ReturnType<typeof api>;
 export type Events = `stanza:${keyof XMPP.AgentEvents}`;
+
+export type ModelBridge = Bridge<ViewAPI, unknown, API, Events>;
+
+const bridge = new Bridge<ViewAPI, unknown, API, Events>();
+bridge.define({
+  ...api({ bridge }),
+  // TODO: expose features
+});
+export default bridge;
