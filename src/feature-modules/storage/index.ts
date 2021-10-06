@@ -17,10 +17,13 @@ declare module "../../features" {
   }
 }
 
-export default ({ provide, require, client }: Context) => {
+export default async ({ provide, require, client }: Context) => {
+  const UID = await require("uid");
+  const uid = await UID.getOrRegisterUID(client.config.jid as string);
+
   // TODO: choose best storage backend using some algorithm
   const keyvalue = new KeyValueStores.idbKeyValue<KeyValueModel>({
-    jid: client.config.jid as string,
+    uid,
     isEncrypted: false,
   });
 

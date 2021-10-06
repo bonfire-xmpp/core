@@ -128,7 +128,7 @@ export function setupFeatures(client: Client, bridge: Bridge): void {
   Promise.race([
     new Promise((resolve) => setTimeout(resolve, 5000)),
     // So long as _anyone_ is waiting on a require()
-    Promise.all(Object.values(requirePromises)),
+    Promise.allSettled(Object.values(requirePromises).flat()),
   ]).then(() => {
     Object.entries(waitingOnRequire).forEach(([feature, fs]) => {
       fs.forEach(([, reject]) =>

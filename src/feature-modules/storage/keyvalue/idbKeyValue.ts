@@ -7,19 +7,19 @@ const store = createStore("keyval-db", "keyval-store");
 export class IDBKeyValue<
   Model = Record<string, any>
 > extends KeyValueStore<Model> {
-  #jid: string;
+  #uid: string;
   #encKey: any;
   #isEncrypted: boolean;
 
-  constructor({ jid, encKey, isEncrypted }: StoreCtor) {
+  constructor({ uid, encKey, isEncrypted }: StoreCtor) {
     super();
-    this.#jid = jid;
+    this.#uid = uid;
     this.#encKey = encKey;
     this.#isEncrypted = isEncrypted;
   }
 
-  get jid() {
-    return this.#jid;
+  get uid() {
+    return this.#uid;
   }
   get encKey() {
     return this.#encKey;
@@ -28,7 +28,6 @@ export class IDBKeyValue<
     return this.#isEncrypted;
   }
 
-  // TODO: implement hash
   private hash(s: string): string {
     return new shajs.sha256().update(s).digest("base64");
   }
@@ -36,12 +35,12 @@ export class IDBKeyValue<
   // NOTE: will throw if the key doesn't exist
   get<K extends keyof Model>(key: K): Promise<Model[K] | undefined> {
     // TODO: decrypt read data
-    return get(this.hash(this.#jid + key), store);
+    return get(this.#uid + key, store);
   }
 
   set<K extends keyof Model>(key: K, value: Model[K]): Promise<void> {
     return set(
-      this.hash(this.#jid + key),
+      this.#uid + key,
       // TODO: encrypt read data
       value,
       store
@@ -49,6 +48,6 @@ export class IDBKeyValue<
   }
 
   delete<K extends keyof Model>(key: K): Promise<void> {
-    return del(this.hash(this.#jid + key), store);
+    return del(this.hash(this.#uid + key), store);
   }
 }

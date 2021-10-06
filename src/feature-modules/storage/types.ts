@@ -1,5 +1,5 @@
 export interface StoreCtor {
-  jid: string;
+  uid: string;
   encKey?: any;
   isEncrypted: boolean;
 }
@@ -7,7 +7,7 @@ export interface StoreCtor {
 export abstract class Store {
   abstract get encKey(): any;
   abstract get isEncrypted(): boolean;
-  abstract get jid(): string;
+  abstract get uid(): string;
 }
 
 export abstract class KeyValueStore<
