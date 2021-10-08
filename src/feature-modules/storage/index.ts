@@ -12,19 +12,31 @@ interface KeyValueModel {
 declare module "../../features" {
   interface Features {
     storage: {
-      keyvalue: KeyValueStore<KeyValueModel>;
+      keyvalue:
+        | KeyValueStore<KeyValueModel>
+        | Promise<KeyValueStore<KeyValueModel>>;
     };
   }
 }
 
-export default async ({ provide, require, client }: Context) => {
+export default async ({ provide, require, bind }: Context) => {
   const UID = await require("uid");
-  const uid = await UID.getOrRegisterUID(client.config.jid as string);
 
-  // TODO: choose best storage backend using some algorithm
-  const keyvalue = new KeyValueStores.idbKeyValue<KeyValueModel>({
-    uid,
-    isEncrypted: false,
+  let resolve: (store: KeyValueStore<KeyValueModel>) => void;
+  const keyvalue: Promise<KeyValueStore<KeyValueModel>> = new Promise((r) => {
+    resolve = r;
+  });
+
+  bind(async ({ client }) => {
+    const uid = await UID.getOrRegisterUID(client.config.jid as string);
+
+    // TODO: choose best storage backend using some algorithm
+    resolve(
+      new KeyValueStores.idbKeyValue<KeyValueModel>({
+        uid,
+        isEncrypted: false,
+      })
+    );
   });
 
   provide(name, {

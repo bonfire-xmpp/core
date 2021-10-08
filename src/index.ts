@@ -1,38 +1,42 @@
 import * as XMPP from "@bonfire-xmpp/verse";
 import { Bridge } from "@bonfire-xmpp/apibridge";
 
-import { setupFeatures, Features } from "./features";
+import { setupFeatures } from "./features";
 
-import type { ViewAPI } from "./view";
+import type { ViewAPI } from "./index.view";
 
-const api = ({ bridge }: { bridge: Bridge }) => ({
-  $state: {
-    client: null as XMPP.Agent | null,
-  },
+const setupApi = ({ bridge }: { bridge: Bridge }) => {
+  const $state = {
+    client: XMPP.createClient({}),
+  };
 
-  async connect(opts: XMPP.AgentConfig): Promise<void> {
-    // Perform an init the first time around
-    if (this.$state.client === null) {
-      this.$state.client = XMPP.createClient(opts);
-      setupFeatures(this.$state.client, bridge);
-      this.$state.client.on("*", (e, ...args) => {
-        bridge.emit(`stanza:${e}`, args);
-        bridge.emit("stanza:*", [e, ...args]);
-      });
-    }
+  const features = setupFeatures($state.client, bridge);
 
-    return this.$state.client.connect(opts);
-  },
-});
+  // Pass along all stanza events to the main thread
+  $state.client.on("*", (e, ...args) => {
+    bridge.emit(`stanza:${e}`, args);
+    bridge.emit("stanza:*", [e, ...args]);
+  });
 
-export type API = ReturnType<typeof api>;
-export type Events = `stanza:${keyof XMPP.AgentEvents}`;
+  return {
+    $state,
+    ...features,
+    connect(opts: XMPP.AgentConfig): void {
+      // TODO: return a promise for connecting?
+      this.$state.client.updateConfig(opts);
+      return this.$state.client.connect();
+    },
+  };
+};
 
-export type ModelBridge = Bridge<ViewAPI, unknown, API, Events>;
+export type ModelAPI = ReturnType<typeof setupApi>;
+export type ModelEvents = `stanza:${keyof XMPP.AgentEvents}`;
+export type ModelBridge = Bridge<ViewAPI, unknown, ModelAPI, ModelEvents>;
 
-const bridge = new Bridge<ViewAPI, unknown, API, Events>();
+// Create a bridge and register our API to it. The user can call extra
+// `define()`s and will have to set up I/O.
+const bridge = new Bridge<ViewAPI, unknown, ModelAPI, ModelEvents>();
 bridge.define({
-  ...api({ bridge }),
-  // TODO: expose features
+  ...setupApi({ bridge }),
 });
 export default bridge;

@@ -33,16 +33,9 @@ declare module "../features" {
 
 const name = "roster";
 
-export default async function ({
-  provide,
-  require,
-  client,
-  bind,
-  bridge,
-}: Context) {
-  const storage = await require("storage");
-
+export default async function ({ provide, client, bind, bridge }: Context) {
   bind(async () => {
+    // TODO: check if the server has a newer version (or we don't have a roster)?
     const roster = await client.getRoster();
     bridge.fn.dispatch(applyDiff(roster));
   });
@@ -109,7 +102,6 @@ export default async function ({
 
   provide(name, {
     accept(jid: string) {
-      // TODO: Remove this JID from the `pending` list
       bridge.fn.dispatch(removePending(JID.toBare(jid)));
       client.acceptSubscription(jid);
       client.subscribe(jid);

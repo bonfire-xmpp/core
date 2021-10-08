@@ -11,7 +11,7 @@ interface RosterState {
 
 // Define the initial state using that type
 const initialState: RosterState = {
-  value: {},
+  value: { items: [] },
   pending: [],
 };
 
